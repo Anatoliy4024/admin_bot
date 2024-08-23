@@ -1,4 +1,4 @@
-# keyboards.py
+## keyboards.py
 
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
 from translations import button_texts  # Импортируем тексты кнопок

@@ -1,3 +1,5 @@
+##translations.py
+
 button_texts = {
     'en': ["View Proforma", "Event Gallery", "Contact Organizer"],
     'ru': ["Посмотреть проформу", "Галерея событий", "Связаться с организатором"],
