@@ -22,10 +22,8 @@ def language_selection_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 def user_options_keyboard(language):
-    """Генерирует три основные кнопки для пользователя на основе выбранного языка."""
+    """Генерирует клавиатуру только с одной кнопкой для получения проформы."""
     keyboard = [
-        [InlineKeyboardButton(button_texts[language][0], callback_data='view_proforma')],
-        [InlineKeyboardButton(button_texts[language][1], callback_data='event_gallery')],
-        [InlineKeyboardButton(button_texts[language][2], callback_data='contact_organizer')]
+        [InlineKeyboardButton(button_texts[language][0], callback_data='get_proforma')]
     ]
     return InlineKeyboardMarkup(keyboard)
