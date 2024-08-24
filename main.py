@@ -1,12 +1,16 @@
 #main.py
 
 from keyboards import language_selection_keyboard, user_options_keyboard
-from modules.constants import UserData, disable_language_buttons
-from config.config import BOT_TOKEN
+import sqlite3
 import logging
-from telegram import Update
+from telegram import Update, Bot
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
-from helpers.database_helpers import send_proforma_to_user, get_latest_proforma_for_user
+from config.config import DATABASE_PATH, BOT_TOKEN
+from modules.constants import UserData, disable_language_buttons
+from helpers.database_helpers import send_proforma_to_user
+from modules.constants import ORDER_STATUS
+
+
 
 # Логирование
 logging.basicConfig(
@@ -40,6 +44,49 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Сохраняем ID сообщения с опциями, чтобы потом их удалить
     context.user_data['options_message_id'] = options_message.message_id
+
+
+# Функция для получения user_id и username по user_id
+def get_user_info_by_user_id(user_id):
+    conn = sqlite3.connect(DATABASE_PATH)
+    cursor = conn.cursor()
+    cursor.execute(
+        "SELECT session_number FROM orders WHERE user_id = ? AND status = ? ORDER BY session_number DESC LIMIT 1",
+        (user_id, ORDER_STATUS["админ_бот получил соообщение"]))
+    cursor.execute("SELECT user_id, username FROM users WHERE user_id = ?", (user_id,))
+    user_info = cursor.fetchone()
+    conn.close()
+    return user_info
+
+
+# Функция для получения последнего session_number
+def get_latest_session_number(user_id):
+    """
+    Получает максимальный session_number для пользователя с user_id и статусом 4.
+    """
+    conn = sqlite3.connect(DATABASE_PATH)
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute("""
+            SELECT session_number 
+            FROM orders 
+            WHERE user_id = ? 
+            AND status = ? 
+            ORDER BY session_number DESC 
+            LIMIT 1
+        """, (user_id, ORDER_STATUS["админ_бот получил соообщение"]))
+
+        result = cursor.fetchone()
+
+        if result:
+            return result[0]  # Возвращает session_number
+        else:
+            raise ValueError("Нет подходящих записей для этого пользователя.")
+
+    finally:
+        conn.close()
+
 
 # Обработчик нажатий на кнопки
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -81,19 +128,34 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Обновляем ID сообщения с новыми опциями
         context.user_data['options_message_id'] = new_options_message.message_id
-
     elif query.data == 'get_proforma':
-
         try:
-            # Получаем последнюю проформу для пользователя
-            proforma_number = await get_latest_proforma_for_user(user_data.user_id)
+            await query.message.reply_text("Привет")
 
-            # Вызов функции для отправки информации о заказе пользователю
-            await send_proforma_to_user(proforma_number)
+            # Получаем user_id пользователя
+            user_id = update.effective_user.id
 
-        except ValueError as e:
-            # Обработка ошибки, если проформа не найдена
-            await query.message.reply_text(f"Ошибка: {str(e)}")
+            # Получаем информацию о пользователе из базы данных
+            user_info = get_user_info_by_user_id(user_id)
+
+            if user_info:
+                username = user_info[1]
+                await query.message.reply_text(f"user_id: {user_id}, username: {username}")
+
+                # Получаем последний session_number для пользователя
+                session_number = get_latest_session_number(user_id)
+
+                if session_number:
+                    await query.message.reply_text(f"Последний session_number: {session_number}")
+                else:
+                    await query.message.reply_text(f"Не удалось найти session_number для user_id: {user_id}")
+            else:
+                await query.message.reply_text(f"user_id: {user_id}, username: не найдено")
+
+        except Exception as e:
+            logger.error(f"Ошибка при получении информации о пользователе: {str(e)}")
+            await query.message.reply_text(f"Произошла ошибка при попытке получить информацию о пользователе: {str(e)}")
+
 
 if __name__ == '__main__':
     application = ApplicationBuilder().token(BOT_TOKEN).build()

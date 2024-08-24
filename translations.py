@@ -1,12 +1,12 @@
 ##translations.py
 
 button_texts = {
-    'en': ["View Proforma", "Event Gallery", "Contact Organizer"],
-    'ru': ["Получить ПРОФОРМУ", "Галерея событий", "Связаться с организатором"],
-    'es': ["Ver Proforma", "Galería de eventos", "Contactar al organizador"],
-    'fr': ["Voir la proforma", "Galerie d'événements", "Contacter l'organisateur"],
-    'uk': ["Отримати ПРОФОРМУ", "Галерея подій", "Зв'язатися з організатором"],
-    'pl': ["Otrzymać PROFORMA", "Galeria wydarzeń", "Skontaktuj się z organizatorem"],
-    'de': ["Proforma erhalten", "Veranstaltungsgalerie", "Kontakt zum Organisator"],
-    'it': ["Ricevi PROFORMA", "Galleria degli eventi", "Contatta l'organizzatore"]
+    'en': ["GET/VIEW PROFORMA", "Event Gallery", "Contact Organizer"],
+    'ru': ["ПОЛУЧИТЬ/ПОСМОТРЕТЬ ПРОФОРМУ", "Галерея событий", "Связаться с организатором"],
+    'es': ["OBTENER/VER PROFORMA", "Galería de eventos", "Contactar al organizador"],
+    'fr': ["OBTENIR/VOIR PROFORMA", "Galerie d'événements", "Contacter l'organisateur"],
+    'uk': ["ОТРИМАТИ/ПЕРЕГЛЯНУТИ ПРОФОРМУ", "Галерея подій", "Зв'язатися з організатором"],
+    'pl': ["UZYSKAJ/ZOBACZ PROFORMĘ", "Galeria wydarzeń", "Skontaktuj się z organizatorem"],
+    'de': ["PROFORMA ERHALTEN/ANSEHEN", "Veranstaltungsgalerie", "Kontakt zum Organisator"],
+    'it': ["OTTENERE/VEDERE PROFORMA", "Galleria degli eventi", "Contatta l'organizzatore"]
 }
