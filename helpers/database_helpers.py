@@ -1,11 +1,8 @@
-## helpers/database_helpers.py
-
 import sqlite3
 import logging
 from telegram import Bot
 from modules.constants import ORDER_STATUS
 from config.config import DATABASE_PATH, BOT_TOKEN
-
 
 def get_user_data(user_id):
     conn = sqlite3.connect(DATABASE_PATH)
@@ -14,7 +11,6 @@ def get_user_data(user_id):
     user_data = cursor.fetchone()
     conn.close()
     return user_data
-
 
 def get_full_proforma(user_id, session_number):
     """
@@ -43,64 +39,12 @@ def get_full_proforma(user_id, session_number):
     finally:
         conn.close()
 
-
-
-
-
-
-
-
-
-
-def get_latest_proforma_for_user(user_id):
-    """
-    Получает номер последней проформы для пользователя по user_id и статусу 4.
-    """
-    conn = sqlite3.connect(DATABASE_PATH)
-    cursor = conn.cursor()
-
-    try:
-        cursor.execute(
-            "SELECT session_number FROM orders WHERE user_id = ? AND status = ? ORDER BY session_number DESC LIMIT 1",
-            (user_id, ORDER_STATUS["админ_бот получил соообщение"])
-        )
-        result = cursor.fetchone()
-
-        if result:
-            session_num = result[0]
-            return f"{user_id}_{session_num}_4"
-        else:
-            raise ValueError("Нет подходящих проформ для этого пользователя.")
-
-    finally:
-        conn.close()
-
-
-async def send_proforma_to_user(proforma_number):
+async def send_proforma_to_user(user_id, session_number):
     """Отправляет информацию о заказе пользователю."""
 
-    # Извлечение ключей из номера проформы
     try:
-        user_id, session_num, status = map(int, proforma_number.split('_'))
-    except ValueError:
-        logging.error(f"Invalid proforma number format: {proforma_number}")
-        return
-
-    # Создаем подключение к базе данных
-    conn = sqlite3.connect(DATABASE_PATH)
-    cursor = conn.cursor()
-
-    try:
-        cursor.execute(
-            "SELECT user_id, session_number, selected_date, start_time, end_time, people_count, selected_style, "
-            "city, calculated_cost FROM orders WHERE user_id = ? AND status = ? AND session_number = ?",
-            (user_id, ORDER_STATUS["зарезервировано"], session_num)
-        )
-        order_info = cursor.fetchone()
-
-        if order_info is None:
-            logging.error(f"No recent orders with status 3 found for user_id {user_id}.")
-            return
+        # Получаем полную проформу
+        order_info = get_full_proforma(user_id, session_number)
 
         # Формируем сообщение для отправки пользователю
         user_message = (
@@ -121,8 +65,12 @@ async def send_proforma_to_user(proforma_number):
         logging.info(f"Message sent to user {user_id}.")
 
         # Обновляем статус ордера
-        cursor.execute("UPDATE orders SET status = ? WHERE user_id = ? AND session_number = ?",
-                       (ORDER_STATUS["сообщение отправлено юзеру"], user_id, session_num))
+        conn = sqlite3.connect(DATABASE_PATH)
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE orders SET status = ? WHERE user_id = ? AND session_number = ?",
+            (ORDER_STATUS["сообщение отправлено юзеру"], user_id, session_number)
+        )
         conn.commit()
 
     except Exception as e:
