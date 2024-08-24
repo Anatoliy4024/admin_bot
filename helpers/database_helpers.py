@@ -16,6 +16,42 @@ def get_user_data(user_id):
     return user_data
 
 
+def get_full_proforma(user_id, session_number):
+    """
+    Получает полную проформу для пользователя по user_id и session_number.
+    """
+    conn = sqlite3.connect(DATABASE_PATH)
+    cursor = conn.cursor()
+
+    try:
+        cursor.execute(
+            """
+            SELECT user_id, session_number, selected_date, start_time, end_time, people_count, selected_style,
+            city, calculated_cost
+            FROM orders
+            WHERE user_id = ? AND session_number = ?
+            """,
+            (user_id, session_number)
+        )
+        order_info = cursor.fetchone()
+
+        if order_info:
+            return order_info
+        else:
+            raise ValueError("Нет подходящей проформы для этого пользователя.")
+
+    finally:
+        conn.close()
+
+
+
+
+
+
+
+
+
+
 def get_latest_proforma_for_user(user_id):
     """
     Получает номер последней проформы для пользователя по user_id и статусу 4.

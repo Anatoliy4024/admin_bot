@@ -1,15 +1,11 @@
-#main.py
-
 from keyboards import language_selection_keyboard, user_options_keyboard
 import sqlite3
 import logging
 from telegram import Update, Bot
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 from config.config import DATABASE_PATH, BOT_TOKEN
-from modules.constants import UserData, disable_language_buttons
-from helpers.database_helpers import send_proforma_to_user
-from modules.constants import ORDER_STATUS
-
+from modules.constants import UserData, disable_language_buttons, ORDER_STATUS
+from helpers.database_helpers import send_proforma_to_user, get_full_proforma
 
 
 # Логирование
@@ -50,9 +46,6 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 def get_user_info_by_user_id(user_id):
     conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
-    cursor.execute(
-        "SELECT session_number FROM orders WHERE user_id = ? AND status = ? ORDER BY session_number DESC LIMIT 1",
-        (user_id, ORDER_STATUS["админ_бот получил соообщение"]))
     cursor.execute("SELECT user_id, username FROM users WHERE user_id = ?", (user_id,))
     user_info = cursor.fetchone()
     conn.close()
@@ -128,33 +121,38 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Обновляем ID сообщения с новыми опциями
         context.user_data['options_message_id'] = new_options_message.message_id
+
     elif query.data == 'get_proforma':
         try:
-            await query.message.reply_text("Привет")
-
             # Получаем user_id пользователя
             user_id = update.effective_user.id
 
-            # Получаем информацию о пользователе из базы данных
-            user_info = get_user_info_by_user_id(user_id)
+            # Получаем последний session_number для пользователя
+            session_number = get_latest_session_number(user_id)
 
-            if user_info:
-                username = user_info[1]
-                await query.message.reply_text(f"user_id: {user_id}, username: {username}")
+            if session_number:
+                # Получаем полную проформу
+                full_proforma = get_full_proforma(user_id, session_number)
 
-                # Получаем последний session_number для пользователя
-                session_number = get_latest_session_number(user_id)
+                # Форматируем сообщение для пользователя
+                user_message = (
+                    f"Ваш заказ подтвержден!\n"
+                    f"ПРОФОРМА № {full_proforma[0]}_{full_proforma[1]}_3\n"
+                    f"Дата мероприятия: {full_proforma[2]}\n"
+                    f"Время: {full_proforma[3]} - {full_proforma[4]}\n"
+                    f"Количество персон: {full_proforma[5]}\n"
+                    f"Стиль мероприятия: {full_proforma[6]}\n"
+                    f"Город: {full_proforma[7]}\n"
+                    f"Сумма к оплате: {float(full_proforma[8]) - 20} евро\n"
+                )
 
-                if session_number:
-                    await query.message.reply_text(f"Последний session_number: {session_number}")
-                else:
-                    await query.message.reply_text(f"Не удалось найти session_number для user_id: {user_id}")
+                await query.message.reply_text(user_message)
             else:
-                await query.message.reply_text(f"user_id: {user_id}, username: не найдено")
+                await query.message.reply_text(f"Не удалось найти session_number для user_id: {user_id}")
 
         except Exception as e:
             logger.error(f"Ошибка при получении информации о пользователе: {str(e)}")
-            await query.message.reply_text(f"Произошла ошибка при попытке получить информацию о пользователе: {str(e)}")
+            await query.message.reply_text("Произошла ошибка при попытке получить информацию о пользователе.")
 
 
 if __name__ == '__main__':
