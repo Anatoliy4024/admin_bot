@@ -102,6 +102,7 @@ def get_latest_session_number(user_id):
 
 
 # Обработчик нажатий на кнопки
+# Обработчик нажатий на кнопки
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
@@ -113,7 +114,23 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         language_code = query.data.split('_')[1]
         user_data.set_language(language_code)
 
-        # Обновляем текст заголовка в зависимости от выбранного языка
+        # Удаляем предыдущие сообщения с опциями и проформой
+        options_message_id = context.user_data.get('options_message_id')
+        proforma_message_id = context.user_data.get('proforma_message_id')
+
+        if options_message_id:
+            try:
+                await context.bot.delete_message(chat_id=query.message.chat_id, message_id=options_message_id)
+            except Exception as e:
+                logger.error(f"Error deleting options message: {e}")
+
+        if proforma_message_id:
+            try:
+                await context.bot.delete_message(chat_id=query.message.chat_id, message_id=proforma_message_id)
+            except Exception as e:
+                logger.error(f"Error deleting proforma message: {e}")
+
+        # Отправляем новые кнопки в соответствии с выбранным языком и заголовок
         headers = {
             'en': "Choose",
             'ru': "Выбери",
@@ -125,15 +142,6 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             'it': "Scegli"
         }
 
-        # Удаляем предыдущее сообщение с опциями
-        options_message_id = context.user_data.get('options_message_id')
-        if options_message_id:
-            try:
-                await context.bot.delete_message(chat_id=query.message.chat_id, message_id=options_message_id)
-            except Exception as e:
-                logger.error(f"Error deleting message: {e}")
-
-        # Отправляем новые кнопки в соответствии с выбранным языком и заголовок
         new_options_message = await query.message.reply_text(
             headers.get(language_code, "Choose"),
             reply_markup=user_options_keyboard(language_code)
@@ -141,6 +149,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Обновляем ID сообщения с новыми опциями
         context.user_data['options_message_id'] = new_options_message.message_id
+
     elif query.data == 'get_proforma':
         try:
             # Получаем user_id пользователя
@@ -151,10 +160,13 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             if session_number:
                 # Отправляем проформу пользователю
-                await send_proforma_to_user(user_id, session_number, user_data)
+                proforma_message = await send_proforma_to_user(user_id, session_number, user_data)
+
+                # Сохраняем ID сообщения с проформой
+                context.user_data['proforma_message_id'] = proforma_message.message_id
+
             else:
                 await query.message.reply_text(f"Не удалось найти session_number для user_id: {user_id}")
-
         except Exception as e:
             logger.error(f"Ошибка при получении информации о пользователе: {str(e)}")
             await query.message.reply_text("Произошла ошибка при попытке получить информацию о пользователе.")
