@@ -27,10 +27,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user_id == IRA_CHAT_ID:
         # Приветственное сообщение для Ирины
         message = await update.message.reply_text(
-            "Привет, Иринушка! Я - твой АдминБот.\n(Это служебное сообщение. На него не надо отвечать)\n"
-            "_____________________________________\n"
-            "Только что PicnicsAlicanteBot зафиксировал бронирование:\n"
-            "ПРОФОРМА №..."
+            "Привет, Иринушка! Я - твой АдминБот."
+            # "(Это служебное сообщение. На него не надо отвечать)\n"
+            # "_____________________________________\n"
+            # "Только что PicnicsAlicanteBot зафиксировал бронирование:\n"
         )
         # Отображаем меню с 5 кнопками для Ирины
         options_message = await update.message.reply_text(
@@ -48,12 +48,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "Выбери действие:",
             reply_markup=service_menu_keyboard()
         )
-    elif user_id == ADMIN_CHAT_ID:
-        # Приветственное сообщение для Администратора
-        message = await update.message.reply_text(
-            "Привет, Админ! Твой id - ........ соответствует правам Администратора.\n"
-            "Вот что ты можешь сделать:"
-        )
+    # elif user_id == ADMIN_CHAT_ID:
+    #     # Приветственное сообщение для Администратора
+    #     message = await update.message.reply_text(
+    #         "Привет, Админ! Твой id - ........ соответствует правам Администратора.\n"
+    #         "Вот что ты можешь сделать:"
+    #     )
         # Отображаем меню с кнопками для Администратора
         options_message = await update.message.reply_text(
             "Выбери действие:",
