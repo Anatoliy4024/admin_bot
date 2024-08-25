@@ -8,6 +8,8 @@ from modules.constants import UserData, disable_language_buttons, ORDER_STATUS
 from helpers.database_helpers import send_proforma_to_user, get_full_proforma
 
 
+
+
 # Логирование
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -55,12 +57,14 @@ def get_user_info_by_user_id(user_id):
 # Функция для получения последнего session_number
 def get_latest_session_number(user_id):
     """
-    Получает максимальный session_number для пользователя с user_id и статусом 4.
+    Получает максимальный session_number для пользователя с user_id.
+    Сначала проверяет статус 5, если не найдено - ищет с статусом 4.
     """
     conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
 
     try:
+        # Сначала пытаемся найти session_number со статусом 5 (сообщение отправлено юзеру)
         cursor.execute("""
             SELECT session_number 
             FROM orders 
@@ -68,14 +72,29 @@ def get_latest_session_number(user_id):
             AND status = ? 
             ORDER BY session_number DESC 
             LIMIT 1
-        """, (user_id, ORDER_STATUS["админ_бот получил соообщение"]))
+        """, (user_id, ORDER_STATUS["сообщение отправлено юзеру"]))
 
         result = cursor.fetchone()
 
         if result:
-            return result[0]  # Возвращает session_number
+            return result[0]  # Возвращает session_number для статуса 5
         else:
-            raise ValueError("Нет подходящих записей для этого пользователя.")
+            # Если ничего не найдено, ищем session_number со статусом 4 (админ_бот получил сообщение)
+            cursor.execute("""
+                SELECT session_number 
+                FROM orders 
+                WHERE user_id = ? 
+                AND status = ? 
+                ORDER BY session_number DESC 
+                LIMIT 1
+            """, (user_id, ORDER_STATUS["админ_бот получил соообщение"]))
+
+            result = cursor.fetchone()
+
+            if result:
+                return result[0]  # Возвращает session_number для статуса 4
+            else:
+                raise ValueError("Нет подходящих записей для этого пользователя.")
 
     finally:
         conn.close()
@@ -121,7 +140,6 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         # Обновляем ID сообщения с новыми опциями
         context.user_data['options_message_id'] = new_options_message.message_id
-
     elif query.data == 'get_proforma':
         try:
             # Получаем user_id пользователя
@@ -131,22 +149,8 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             session_number = get_latest_session_number(user_id)
 
             if session_number:
-                # Получаем полную проформу
-                full_proforma = get_full_proforma(user_id, session_number)
-
-                # Форматируем сообщение для пользователя
-                user_message = (
-                    f"Ваш заказ подтвержден!\n"
-                    f"ПРОФОРМА № {full_proforma[0]}_{full_proforma[1]}_3\n"
-                    f"Дата мероприятия: {full_proforma[2]}\n"
-                    f"Время: {full_proforma[3]} - {full_proforma[4]}\n"
-                    f"Количество персон: {full_proforma[5]}\n"
-                    f"Стиль мероприятия: {full_proforma[6]}\n"
-                    f"Город: {full_proforma[7]}\n"
-                    f"Сумма к оплате: {float(full_proforma[8]) - 20} евро\n"
-                )
-
-                await query.message.reply_text(user_message)
+                # Отправляем проформу пользователю
+                await send_proforma_to_user(user_id, session_number, user_data)
             else:
                 await query.message.reply_text(f"Не удалось найти session_number для user_id: {user_id}")
 

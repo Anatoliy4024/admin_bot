@@ -3,6 +3,8 @@ import logging
 from telegram import Bot
 from modules.constants import ORDER_STATUS
 from config.config import DATABASE_PATH, BOT_TOKEN
+from translations import translations
+
 
 def get_user_data(user_id):
     conn = sqlite3.connect(DATABASE_PATH)
@@ -39,23 +41,29 @@ def get_full_proforma(user_id, session_number):
     finally:
         conn.close()
 
-async def send_proforma_to_user(user_id, session_number):
+
+async def send_proforma_to_user(user_id, session_number, user_data):
     """Отправляет информацию о заказе пользователю."""
 
     try:
         # Получаем полную проформу
         order_info = get_full_proforma(user_id, session_number)
 
+        # Получаем язык пользователя из user_data
+        language = user_data.get_language() or 'en'
+        trans = translations.get(language, translations['en'])  # Используем 'en' по умолчанию
+
         # Формируем сообщение для отправки пользователю
         user_message = (
-            f"Ваш заказ подтвержден!\n"
-            f"ПРОФОРМА № {order_info[0]}_{order_info[1]}_3\n"
-            f"Дата мероприятия: {order_info[2]}\n"
-            f"Время: {order_info[3]} - {order_info[4]}\n"
-            f"Количество персон: {order_info[5]}\n"
-            f"Стиль мероприятия: {order_info[6]}\n"
-            f"Город: {order_info[7]}\n"
-            f"Сумма к оплате: {float(order_info[8]) - 20} евро\n"
+            f"{trans['order_confirmed']}\n"
+            f"{trans['proforma_number']} {order_info[0]}_{order_info[1]}_3\n"
+            f"{trans['event_date']} {order_info[2]}\n"
+            f"{trans['time']} {order_info[3]} - {order_info[4]}\n"
+            f"{trans['people_count']} {order_info[5]}\n"
+            f"{trans['event_style']} {order_info[6]}\n"
+            f"{trans['city']} {order_info[7]}\n"
+            f"{trans['amount_to_pay']} {float(order_info[8]) - 20} евро\n"
+            f"\n{trans['delivery_info']}"
         )
 
         # Отправляем сообщение пользователю
