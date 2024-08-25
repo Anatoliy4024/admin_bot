@@ -21,7 +21,9 @@ translations = {
         'city': "City:",
         'amount_to_pay': "Amount to pay:",
         'status': "Status:",
-        'delivery_info': "If the event zone is within Alicante (15 km zone), the delivery of equipment is free. If further, the cost is 0.5 euros per km."
+        'delivery_info': "If the event zone is within Alicante (15 km zone), the delivery of equipment is free."
+                         " If further, the cost is 0.5 euros per km.",
+        'currency': "euros"
     },
     'ru': {
         'order_confirmed': "Ваш заказ подтвержден!",
@@ -33,7 +35,9 @@ translations = {
         'city': "Город:",
         'amount_to_pay': "Сумма к оплате:",
         'status': "Статус:",
-        'delivery_info': "Если зона мероприятия в пределах Аликанте (15 км зона), доставка реквизита бесплатна. Если дальше, стоимость 0.5 евро за км."
+        'delivery_info': "Если зона мероприятия в пределах Аликанте (15 км зона), доставка реквизита бесплатна."
+                         " Если дальше, стоимость 0.5 евро за км.",
+        'currency': "евро"
     },
     'de': {
         'order_confirmed': "Ihre Bestellung ist bestätigt!",
@@ -45,7 +49,9 @@ translations = {
         'city': "Stadt:",
         'amount_to_pay': "Zu zahlender Betrag:",
         'status': "Status:",
-        'delivery_info': "Wenn die Veranstaltungszone innerhalb von Alicante (15 km Zone) liegt, ist die Lieferung der Ausrüstung kostenlos. Wenn weiter, betragen die Kosten 0,5 Euro pro km."
+        'delivery_info': "Wenn die Veranstaltungszone innerhalb von Alicante (15 km Zone) liegt,"
+                         " ist die Lieferung der Ausrüstung kostenlos. Wenn weiter, betragen die Kosten 0,5 Euro pro km.",
+        'currency': "Euro"
     },
     'es': {
         'order_confirmed': "¡Su pedido está confirmado!",
@@ -57,7 +63,9 @@ translations = {
         'city': "Ciudad:",
         'amount_to_pay': "Monto a pagar:",
         'status': "Estado:",
-        'delivery_info': "Si la zona del evento está dentro de Alicante (zona de 15 km), la entrega del equipo es gratuita. Si está más lejos, el costo es de 0,5 euros por km."
+        'delivery_info': "Si la zona del evento está dentro de Alicante (zona de 15 km), "
+                         "la entrega del equipo es gratuita. Si está más lejos, el costo es de 0,5 euros por km.",
+        'currency': "euros"
     },
     'fr': {
         'order_confirmed': "Votre commande est confirmée!",
@@ -69,7 +77,9 @@ translations = {
         'city': "Ville:",
         'amount_to_pay': "Montant à payer:",
         'status': "Statut:",
-        'delivery_info': "Si la zone de l'événement se trouve dans les environs d'Alicante (zone de 15 km), la livraison de l'équipement est gratuite. Sinon, le coût est de 0,5 euros par km."
+        'delivery_info': "Si la zone de l'événement se trouve dans les environs d'Alicante (zone de 15 km), "
+                         "la livraison de l'équipement est gratuite. Sinon, le coût est de 0,5 euros par km.",
+        'currency': "euros"
     },
     'uk': {
         'order_confirmed': "Ваше замовлення підтверджено!",
@@ -81,7 +91,9 @@ translations = {
         'city': "Місто:",
         'amount_to_pay': "Сума до оплати:",
         'status': "Статус:",
-        'delivery_info': "Якщо зона заходу знаходиться в межах Аліканте (зона 15 км), доставка обладнання безкоштовна. Якщо далі, вартість становить 0,5 євро за км."
+        'delivery_info': "Якщо зона заходу знаходиться в межах Аліканте (зона 15 км), доставка обладнання безкоштовна. "
+                         "Якщо далі, вартість становить 0,5 євро за км.",
+        'currency': "євро"
     },
     'pl': {
         'order_confirmed': "Twoje zamówienie zostało potwierdzone!",
@@ -93,7 +105,9 @@ translations = {
         'city': "Miasto:",
         'amount_to_pay': "Kwota do zapłaty:",
         'status': "Status:",
-        'delivery_info': "Jeśli strefa wydarzenia znajduje się w Alicante (strefa 15 km), dostawa sprzętu jest bezpłatna. Jeśli dalej, koszt wynosi 0,5 euro za km."
+        'delivery_info': "Jeśli strefa wydarzenia znajduje się w Alicante (strefa 15 km), dostawa sprzętu jest bezpłatna. "
+                         "Jeśli dalej, koszt wynosi 0,5 euro za km.",
+        'currency': "euro"
     },
     'it': {
         'order_confirmed': "Il tuo ordine è confermato!",
@@ -105,6 +119,9 @@ translations = {
         'city': "Città:",
         'amount_to_pay': "Importo da pagare:",
         'status': "Stato:",
-        'delivery_info': "Se la zona dell'evento è entro 15 km da Alicante, la consegna dell'attrezzatura è gratuita. Se più lontano, il costo è di 0,5 euro per km."
+        'delivery_info': "Se la zona dell'evento è entro 15 km da Alicante, la consegna dell'attrezzatura è gratuita."
+                         " Se più lontano, il costo è di 0,5 euro per km.",
+        'currency': "euro"
     }
 }
+
