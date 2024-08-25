@@ -47,5 +47,64 @@ translations = {
         'status': "Status:",
         'delivery_info': "Wenn die Veranstaltungszone innerhalb von Alicante (15 km Zone) liegt, ist die Lieferung der Ausrüstung kostenlos. Wenn weiter, betragen die Kosten 0,5 Euro pro km."
     },
-    # Добавьте другие языки по аналогии
+    'es': {
+        'order_confirmed': "¡Su pedido está confirmado!",
+        'proforma_number': "PROFORMA №",
+        'event_date': "Fecha del evento:",
+        'time': "Hora:",
+        'people_count': "Número de personas:",
+        'event_style': "Estilo del evento:",
+        'city': "Ciudad:",
+        'amount_to_pay': "Monto a pagar:",
+        'status': "Estado:",
+        'delivery_info': "Si la zona del evento está dentro de Alicante (zona de 15 km), la entrega del equipo es gratuita. Si está más lejos, el costo es de 0,5 euros por km."
+    },
+    'fr': {
+        'order_confirmed': "Votre commande est confirmée!",
+        'proforma_number': "PROFORMA №",
+        'event_date': "Date de l'événement:",
+        'time': "Heure:",
+        'people_count': "Nombre de personnes:",
+        'event_style': "Style de l'événement:",
+        'city': "Ville:",
+        'amount_to_pay': "Montant à payer:",
+        'status': "Statut:",
+        'delivery_info': "Si la zone de l'événement se trouve dans les environs d'Alicante (zone de 15 km), la livraison de l'équipement est gratuite. Sinon, le coût est de 0,5 euros par km."
+    },
+    'uk': {
+        'order_confirmed': "Ваше замовлення підтверджено!",
+        'proforma_number': "ПРОФОРМА №",
+        'event_date': "Дата події:",
+        'time': "Час:",
+        'people_count': "Кількість людей:",
+        'event_style': "Стиль заходу:",
+        'city': "Місто:",
+        'amount_to_pay': "Сума до оплати:",
+        'status': "Статус:",
+        'delivery_info': "Якщо зона заходу знаходиться в межах Аліканте (зона 15 км), доставка обладнання безкоштовна. Якщо далі, вартість становить 0,5 євро за км."
+    },
+    'pl': {
+        'order_confirmed': "Twoje zamówienie zostało potwierdzone!",
+        'proforma_number': "PROFORMA №",
+        'event_date': "Data wydarzenia:",
+        'time': "Czas:",
+        'people_count': "Liczba osób:",
+        'event_style': "Styl wydarzenia:",
+        'city': "Miasto:",
+        'amount_to_pay': "Kwota do zapłaty:",
+        'status': "Status:",
+        'delivery_info': "Jeśli strefa wydarzenia znajduje się w Alicante (strefa 15 km), dostawa sprzętu jest bezpłatna. Jeśli dalej, koszt wynosi 0,5 euro za km."
+    },
+    'it': {
+        'order_confirmed': "Il tuo ordine è confermato!",
+        'proforma_number': "PROFORMA №",
+        'event_date': "Data dell'evento:",
+        'time': "Ora:",
+        'people_count': "Numero di persone:",
+        'event_style': "Stile dell'evento:",
+        'city': "Città:",
+        'amount_to_pay': "Importo da pagare:",
+        'status': "Stato:",
+        'delivery_info': "Se la zona dell'evento è entro 15 km da Alicante, la consegna dell'attrezzatura è gratuita. Se più lontano, il costo è di 0,5 euro per km."
+    }
 }

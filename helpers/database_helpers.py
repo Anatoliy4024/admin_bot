@@ -50,9 +50,15 @@ async def send_proforma_to_user(user_id, session_number, user_data):
         # Получаем полную проформу
         order_info = get_full_proforma(user_id, session_number)
 
+        if not order_info:
+            raise ValueError("Order information is missing or incomplete.")
+
         # Получаем язык пользователя из user_data
         language = user_data.get_language() or 'en'
         trans = translations.get(language, translations['en'])  # Используем 'en' по умолчанию
+
+        # Добавляем отладочный вывод для проверки языка
+        logging.info(f"User ID: {user_id}, Language: {language}")
 
         # Формируем сообщение для отправки пользователю
         user_message = (
@@ -87,4 +93,5 @@ async def send_proforma_to_user(user_id, session_number, user_data):
         print(f"Ошибка при отправке сообщения: {e}")
 
     finally:
-        conn.close()
+        if conn:
+            conn.close()
