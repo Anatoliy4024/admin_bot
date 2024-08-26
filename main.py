@@ -243,6 +243,7 @@ def format_proforma_message(order_info):
         f"Текущий статус: {order_info[10]}"  # Добавляем текущий статус
     )
 
+
 async def handle_irina_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
     if user.id == IRA_CHAT_ID:
@@ -251,11 +252,27 @@ async def handle_irina_input(update: Update, context: ContextTypes.DEFAULT_TYPE)
         user_id, session_number, status = parse_proforma_number(proforma_number)
         order_info = get_full_proforma(user_id, session_number)
         if order_info:
-            # Формируем и отправляем сообщение с проформой Ирине
-            message_text = format_proforma_message(order_info)
+            # Преобразуем числовой статус в текстовое описание
+            status_description = ORDER_STATUS_REVERSE.get(order_info[10], "Неизвестный статус")
+
+            # Формируем сообщение с информацией о проформе
+            message_text = (
+                f"Информация по заказу:\n"
+                f"Номер проформы: {order_info[0]}_{order_info[1]}\n"
+                f"Дата мероприятия: {order_info[2]}\n"
+                f"Время: {order_info[3]} - {order_info[4]}\n"
+                f"Количество людей: {order_info[5]}\n"
+                f"Стиль мероприятия: {order_info[6]}\n"
+                f"Город: {order_info[7]}\n"
+                f"Стоимость: {order_info[8]} евро\n"
+                f"Предпочтения: {order_info[9]}\n"
+                f"Текущий статус: {status_description}"  # Добавляем расшифровку статуса
+            )
+            # Отправляем информацию о проформе Ирине
             await update.message.reply_text(message_text)
         else:
             await update.message.reply_text("Проформа не найдена.")
+
 
 def parse_proforma_number(proforma_number):
     """
