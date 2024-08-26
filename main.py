@@ -248,6 +248,15 @@ async def handle_irina_input(update: Update, context: ContextTypes.DEFAULT_TYPE)
     user = update.message.from_user
     if user.id == IRA_CHAT_ID:
         proforma_number = update.message.text
+
+        # Удаляем предыдущее сообщение с проформой, если оно существует
+        previous_message_id = context.user_data.get('proforma_message_id')
+        if previous_message_id:
+            try:
+                await context.bot.delete_message(chat_id=update.effective_chat.id, message_id=previous_message_id)
+            except Exception as e:
+                logging.error(f"Ошибка при удалении предыдущего сообщения: {e}")
+
         # Парсим номер проформы и получаем данные из БД
         user_id, session_number, status = parse_proforma_number(proforma_number)
         order_info = get_full_proforma(user_id, session_number)
@@ -266,10 +275,12 @@ async def handle_irina_input(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 f"Город: {order_info[7]}\n"
                 f"Стоимость: {order_info[8]} евро\n"
                 f"Предпочтения: {order_info[9]}\n"
-                f"Текущий статус: {status_description}"  # Добавляем расшифровку статуса
+                f"Текущий статус: {status_description}"
             )
-            # Отправляем информацию о проформе Ирине
-            await update.message.reply_text(message_text)
+
+            # Отправляем информацию о проформе Ирине и сохраняем ID сообщения
+            sent_message = await update.message.reply_text(message_text)
+            context.user_data['proforma_message_id'] = sent_message.message_id
         else:
             await update.message.reply_text("Проформа не найдена.")
 
