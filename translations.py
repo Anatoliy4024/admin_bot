@@ -1,15 +1,16 @@
 ##translations.py
 
 button_texts = {
-    'en': ["GET/VIEW PROFORMA", "Event Gallery", "Contact Organizer"],
-    'ru': ["ПОЛУЧИТЬ/ПОСМОТРЕТЬ ПРОФОРМУ", "Галерея событий", "Связаться с организатором"],
-    'es': ["OBTENER/VER PROFORMA", "Galería de eventos", "Contactar al organizador"],
-    'fr': ["OBTENIR/VOIR PROFORMA", "Galerie d'événements", "Contacter l'organisateur"],
-    'uk': ["ОТРИМАТИ/ПЕРЕГЛЯНУТИ ПРОФОРМУ", "Галерея подій", "Зв'язатися з організатором"],
-    'pl': ["UZYSKAJ/ZOBACZ PROFORMĘ", "Galeria wydarzeń", "Skontaktuj się z organizatorem"],
-    'de': ["PROFORMA ERHALTEN/ANSEHEN", "Veranstaltungsgalerie", "Kontakt zum Organisator"],
-    'it': ["OTTENERE/VEDERE PROFORMA", "Galleria degli eventi", "Contatta l'organizzatore"]
+    'en': ["GET/VIEW PROFORMA", "CONTACT ORGANIZER", "VISIT GALLERY"],
+    'ru': ["ПОЛУЧИТЬ/ПОСМОТРЕТЬ ПРОФОРМУ", "НАПИСАТЬ ОРГАНИЗАТОРУ", "ПЕРЕЙТИ В ГАЛЕРЕЮ"],
+    'es': ["OBTENER/VER PROFORMA", "CONTACTAR AL ORGANIZADOR", "VISITAR GALERÍA"],
+    'fr': ["OBTENIR/VOIR PROFORMA", "CONTACTER L'ORGANISATEUR", "VISITER LA GALERIE"],
+    'uk': ["ОТРИМАТИ/ПЕРЕГЛЯНУТИ ПРОФОРМУ", "ЗВ'ЯЗАТИСЯ З ОРГАНІЗАТОРОМ", "ПЕРЕЙТИ В ГАЛЕРЕЮ"],
+    'pl': ["UZYSKAJ/ZOBACZ PROFORMĘ", "SKONTAKTUJ SIĘ Z ORGANIZATOREM", "PRZEJDŹ DO GALERII"],
+    'de': ["PROFORMA ERHALTEN/ANSEHEN", "KONTAKT ZUM ORGANISATOR", "GALERIE BESUCHEN"],
+    'it': ["OTTENERE/VEDERE PROFORMA", "CONTATTA L'ORGANIZZATORE", "VISITA LA GALLERIA"]
 }
+
 translations = {
     'en': {
         'order_confirmed': "Your order is confirmed!",

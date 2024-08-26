@@ -28,18 +28,17 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_data = context.user_data.get('user_data', UserData())
     context.user_data['user_data'] = user_data
 
+    options_message = None  # Инициализация переменной
+
     # Проверка ID пользователя
     if user_id == IRA_CHAT_ID:
         # Приветственное сообщение для Ирины
         message = await update.message.reply_text(
             "Привет, Иринушка! Я - твой АдминБот."
-            # "(Это служебное сообщение. На него не надо отвечать)\n"
-            # "_____________________________________\n"
-            # "Только что PicnicsAlicanteBot зафиксировал бронирование:\n"
         )
         # Отображаем меню с 5 кнопками для Ирины
         options_message = await update.message.reply_text(
-            "Выбери действие:",
+            "ВЫБЕРИ ДЕЙСТВИЕ:",
             reply_markup=irina_service_menu()
         )
     elif user_id == ADMIN_CHAT_ID:
@@ -50,19 +49,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         # Отображаем меню с кнопками для Службы сервиса
         options_message = await update.message.reply_text(
-            "Выбери действие:",
+            "ВЫБЕРИ ДЕЙСТВИЕ:",
             reply_markup=service_menu_keyboard()
-        )
-    # elif user_id == ADMIN_CHAT_ID:
-    #     # Приветственное сообщение для Администратора
-    #     message = await update.message.reply_text(
-    #         "Привет, Админ! Твой id - ........ соответствует правам Администратора.\n"
-    #         "Вот что ты можешь сделать:"
-    #     )
-        # Отображаем меню с кнопками для Администратора
-        options_message = await update.message.reply_text(
-            "Выбери действие:",
-            reply_markup=irina_service_menu()  # Можно использовать ту же клавиатуру, если действия одинаковые
         )
     else:
         # Обычное приветственное сообщение для других пользователей
@@ -73,7 +61,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     # Сохраняем ID сообщения с кнопками, чтобы потом их заменить
     context.user_data['language_message_id'] = message.message_id
-    context.user_data['options_message_id'] = options_message.message_id
+
+    # Проверка и сохранение ID сообщения с опциями, если оно существует
+    if options_message:
+        context.user_data['options_message_id'] = options_message.message_id
+
 
 # Функция для получения user_id и username по user_id
 def get_user_info_by_user_id(user_id):
@@ -85,16 +77,17 @@ def get_user_info_by_user_id(user_id):
     return user_info
 
 # Функция для получения последнего session_number
+
 def get_latest_session_number(user_id):
     """
     Получает максимальный session_number для пользователя с user_id.
-    Сначала проверяет статус 5, если не найдено - ищет со статусом 4.
+    Если найден статус 4, обновляет его на 5 после просмотра проформы.
     """
     conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
 
     try:
-        # Сначала пытаемся найти session_number со статусом 5 (сообщение отправлено юзеру)
+        # Сначала пытаемся найти session_number со статусом 4 (Ирина и Сервисная служба получили сообщение)
         cursor.execute("""
             SELECT session_number 
             FROM orders 
@@ -102,14 +95,27 @@ def get_latest_session_number(user_id):
             AND status = ? 
             ORDER BY session_number DESC 
             LIMIT 1
-        """, (user_id, ORDER_STATUS["сообщение отправлено юзеру"]))
+        """, (user_id, ORDER_STATUS["4-Ирина и Сервисная служба получили сообщение о новой ПРОФОРМЕ"]))
 
         result = cursor.fetchone()
 
         if result:
-            return result[0]  # Возвращает session_number для статуса 5
+            session_number = result[0]
+
+            # # Обновляем статус на 5 (Заказчик просмотрел ПРОФОРМУ)
+            # cursor.execute("""
+            #     UPDATE orders
+            #     SET status = ?
+            #     WHERE user_id = ?
+            #     AND session_number = ?
+            # """, (ORDER_STATUS["5-Заказчик зашел в АдминБот и просмотрел свою ПРОФОРМУ"], user_id, session_number))
+            #
+            # conn.commit()
+
+            return session_number  # Возвращает session_number после обновления статуса
+
         else:
-            # Если ничего не найдено, ищем session_number со статусом 4 (админ_бот получил сообщение)
+            # Если ничего не найдено, ищем session_number со статусом 5 (Заказчик просмотрел ПРОФОРМУ)
             cursor.execute("""
                 SELECT session_number 
                 FROM orders 
@@ -117,22 +123,27 @@ def get_latest_session_number(user_id):
                 AND status = ? 
                 ORDER BY session_number DESC 
                 LIMIT 1
-            """, (user_id, ORDER_STATUS["админ_бот получил соообщение"]))
+            """, (user_id, ORDER_STATUS["5-Заказчик зашел в АдминБот и просмотрел свою ПРОФОРМУ"]))
 
             result = cursor.fetchone()
 
             if result:
-                return result[0]  # Возвращает session_number для статуса 4
+                return result[0]  # Возвращает session_number для статуса 5
             else:
                 raise ValueError("Нет подходящих записей для этого пользователя.")
 
     finally:
         conn.close()
 
+
 # Обработчик нажатий на кнопки
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
+
+    if query.data == 'inactive_button':
+        # Эта кнопка неактивна, ничего не делаем
+        return
 
     user_data = context.user_data.get('user_data', UserData())
     context.user_data['user_data'] = user_data

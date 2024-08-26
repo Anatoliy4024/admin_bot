@@ -78,7 +78,7 @@ async def send_proforma_to_user(user_id, session_number, user_data):
         cursor = conn.cursor()
         cursor.execute(
             "UPDATE orders SET status = ? WHERE user_id = ? AND session_number = ?",
-            (ORDER_STATUS["сообщение отправлено юзеру"], user_id, session_number)
+            (ORDER_STATUS["5-Заказчик зашел в АдминБот и просмотрел свою ПРОФОРМУ"], user_id, session_number)
         )
         conn.commit()
 

@@ -45,13 +45,11 @@ def service_menu_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 
-
-
-
-
 def user_options_keyboard(language):
-    """Генерирует клавиатуру только с одной кнопкой для получения проформы."""
+    """Генерирует клавиатуру с кнопками."""
     keyboard = [
-        [InlineKeyboardButton(button_texts[language][0], callback_data='get_proforma')]
+        [InlineKeyboardButton(button_texts[language][0], callback_data='get_proforma')],
+        [InlineKeyboardButton(button_texts[language][1], callback_data='disabled_button')],  # Неактивная кнопка
+        [InlineKeyboardButton(button_texts[language][2], url='https://www.instagram.com/picnicsalicante?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==')]
     ]
     return InlineKeyboardMarkup(keyboard)
