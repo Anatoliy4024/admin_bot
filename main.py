@@ -102,16 +102,6 @@ def get_latest_session_number(user_id):
         if result:
             session_number = result[0]
 
-            # # Обновляем статус на 5 (Заказчик просмотрел ПРОФОРМУ)
-            # cursor.execute("""
-            #     UPDATE orders
-            #     SET status = ?
-            #     WHERE user_id = ?
-            #     AND session_number = ?
-            # """, (ORDER_STATUS["5-Заказчик зашел в АдминБот и просмотрел свою ПРОФОРМУ"], user_id, session_number))
-            #
-            # conn.commit()
-
             return session_number  # Возвращает session_number после обновления статуса
 
         else:

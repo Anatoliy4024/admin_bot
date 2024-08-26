@@ -45,11 +45,13 @@ def service_menu_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+
 def user_options_keyboard(language):
-    """Генерирует клавиатуру с кнопками."""
+    """Генерирует клавиатуру с тремя кнопками."""
     keyboard = [
         [InlineKeyboardButton(button_texts[language][0], callback_data='get_proforma')],
-        [InlineKeyboardButton(button_texts[language][1], callback_data='disabled_button')],  # Неактивная кнопка
-        [InlineKeyboardButton(button_texts[language][2], url='https://www.instagram.com/picnicsalicante?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==')]
+        [InlineKeyboardButton(button_texts[language][1], url='https://www.instagram.com/picnicsalicante')],
+        [InlineKeyboardButton(button_texts[language][2], url='https://wa.me/34667574895?text=Привет,%20Ирина!%20У%20меня%20есть%20вопрос%20по%20поводу%20пикника.')]
     ]
     return InlineKeyboardMarkup(keyboard)
