@@ -25,7 +25,8 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 def irina_service_menu():
     keyboard = [
-        [InlineKeyboardButton("Кнопка 1", callback_data='btn1')],
+        [InlineKeyboardButton("Найти и смотреть ордер", callback_data='find_and_view_order')],
+        # Другие кнопки
         [InlineKeyboardButton("Кнопка 2", callback_data='btn2')],
         [InlineKeyboardButton("Кнопка 3", callback_data='btn3')],
         [InlineKeyboardButton("Кнопка 4", callback_data='btn4')],

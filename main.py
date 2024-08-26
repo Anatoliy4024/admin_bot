@@ -6,6 +6,11 @@ from config.config import DATABASE_PATH, BOT_TOKEN, IRA_CHAT_ID, ADMIN_CHAT_ID  
 from modules.constants import UserData, disable_language_buttons, ORDER_STATUS
 from helpers.database_helpers import send_proforma_to_user, get_full_proforma
 from keyboards import language_selection_keyboard, user_options_keyboard, irina_service_menu, service_menu_keyboard
+from text_handlers import handle_message
+from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, MessageHandler, filters
+
+ORDER_STATUS_REVERSE = {v: k for k, v in ORDER_STATUS.items()}
+
 
 # Логирование
 logging.basicConfig(
@@ -83,7 +88,7 @@ def get_user_info_by_user_id(user_id):
 def get_latest_session_number(user_id):
     """
     Получает максимальный session_number для пользователя с user_id.
-    Сначала проверяет статус 5, если не найдено - ищет с статусом 4.
+    Сначала проверяет статус 5, если не найдено - ищет со статусом 4.
     """
     conn = sqlite3.connect(DATABASE_PATH)
     cursor = conn.cursor()
@@ -193,6 +198,19 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             logger.error(f"Ошибка при получении информации о пользователе: {str(e)}")
             await query.message.reply_text("Произошла ошибка при попытке получить информацию о пользователе.")
 
+        # Добавляем новый блок для обработки кнопки "Найти и смотреть ордер"
+    elif query.data == 'find_and_view_order':
+        try:
+            # Отправляем сообщение с запросом номера ордера
+            await query.message.reply_text("Пожалуйста, введите номер ордера:")
+
+            # Устанавливаем шаг для ожидания ввода номера ордера
+            user_data.set_step('awaiting_order_number')
+        except Exception as e:
+            logger.error(f"Ошибка при обработке запроса на поиск ордера: {str(e)}")
+            await query.message.reply_text("Произошла ошибка при попытке обработать запрос на поиск ордера.")
+
+
 # Добавляем обработчик для кнопок Ирины и Службы сервиса
 async def irina_service_buttons_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -209,11 +227,60 @@ async def irina_service_buttons_callback(update: Update, context: ContextTypes.D
     elif query.data == 'btn5':
         await query.message.reply_text("Вы выбрали действие 5")
 
+
+def format_proforma_message(order_info):
+    """Форматирует сообщение с информацией о проформе для Ирины."""
+    return (
+        f"Информация по заказу:\n"
+        f"Номер проформы: {order_info[0]}_{order_info[1]}\n"
+        f"Дата мероприятия: {order_info[2]}\n"
+        f"Время: {order_info[3]} - {order_info[4]}\n"
+        f"Количество людей: {order_info[5]}\n"
+        f"Стиль мероприятия: {order_info[6]}\n"
+        f"Город: {order_info[7]}\n"
+        f"Стоимость: {order_info[8]} евро\n"
+        f"Предпочтения: {order_info[9]}\n"  # Добавляем предпочтения
+        f"Текущий статус: {order_info[10]}"  # Добавляем текущий статус
+    )
+
+async def handle_irina_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.message.from_user
+    if user.id == IRA_CHAT_ID:
+        proforma_number = update.message.text
+        # Парсим номер проформы и получаем данные из БД
+        user_id, session_number, status = parse_proforma_number(proforma_number)
+        order_info = get_full_proforma(user_id, session_number)
+        if order_info:
+            # Формируем и отправляем сообщение с проформой Ирине
+            message_text = format_proforma_message(order_info)
+            await update.message.reply_text(message_text)
+        else:
+            await update.message.reply_text("Проформа не найдена.")
+
+def parse_proforma_number(proforma_number):
+    """
+    Парсинг номера проформы для извлечения user_id, session_number и status.
+    Пример формата: '123456_1_3' => user_id=123456, session_number=1, status=3
+    """
+    try:
+        user_id, session_number, status = proforma_number.split('_')
+
+        logging.info(f"Результат парсинга: user_id={user_id}, session_number={session_number}, status={status}")
+
+        return int(user_id), int(session_number), int(status)
+    except ValueError:
+        logging.error(f"Ошибка парсинга номера проформы: {proforma_number}")
+        return None, None, None
+
+
 # Основной блок
+
 if __name__ == '__main__':
     application = ApplicationBuilder().token(BOT_TOKEN).build()
 
     application.add_handler(CommandHandler('start', start))
     application.add_handler(CallbackQueryHandler(button_callback))
-    application.add_handler(CallbackQueryHandler(irina_service_buttons_callback))  # Обработчик кнопок
+    application.add_handler(CallbackQueryHandler(irina_service_buttons_callback))
+    application.add_handler(MessageHandler(filters.TEXT & filters.User(IRA_CHAT_ID), handle_irina_input))  # Обработчик для Ирины
+
     application.run_polling()

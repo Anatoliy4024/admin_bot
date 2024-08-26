@@ -26,7 +26,7 @@ def get_full_proforma(user_id, session_number):
         cursor.execute(
             """
             SELECT user_id, session_number, selected_date, start_time, end_time, people_count, selected_style,
-            city, calculated_cost
+            city, calculated_cost, preferences, status
             FROM orders
             WHERE user_id = ? AND session_number = ?
             """,
