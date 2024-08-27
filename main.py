@@ -4,10 +4,11 @@ from telegram import Update, Bot
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
 from config.config import DATABASE_PATH, BOT_TOKEN, IRA_CHAT_ID, ADMIN_CHAT_ID  # Импортируем ID ДЛЯ СЦЕНАРИЯ ИРИНА И СЕРВИС
 from modules.constants import UserData, disable_language_buttons, ORDER_STATUS
-from helpers.database_helpers import send_proforma_to_user, get_full_proforma
-from keyboards import language_selection_keyboard, user_options_keyboard, irina_service_menu, service_menu_keyboard
-from text_handlers import handle_message
+from helpers.database_helpers import send_proforma_to_user, get_full_proforma, get_latest_session_number
+from keyboards import user_options_keyboard, irina_service_menu, service_menu_keyboard
 from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, MessageHandler, filters
+from translations import language_selection_keyboard
+
 
 ORDER_STATUS_REVERSE = {v: k for k, v in ORDER_STATUS.items()}
 
@@ -78,52 +79,6 @@ def get_user_info_by_user_id(user_id):
 
 # Функция для получения последнего session_number
 
-def get_latest_session_number(user_id):
-    """
-    Получает максимальный session_number для пользователя с user_id.
-    Если найден статус 4, обновляет его на 5 после просмотра проформы.
-    """
-    conn = sqlite3.connect(DATABASE_PATH)
-    cursor = conn.cursor()
-
-    try:
-        # Сначала пытаемся найти session_number со статусом 4 (Ирина и Сервисная служба получили сообщение)
-        cursor.execute("""
-            SELECT session_number 
-            FROM orders 
-            WHERE user_id = ? 
-            AND status = ? 
-            ORDER BY session_number DESC 
-            LIMIT 1
-        """, (user_id, ORDER_STATUS["4-Ирина и Сервисная служба получили сообщение о новой ПРОФОРМЕ"]))
-
-        result = cursor.fetchone()
-
-        if result:
-            session_number = result[0]
-
-            return session_number  # Возвращает session_number после обновления статуса
-
-        else:
-            # Если ничего не найдено, ищем session_number со статусом 5 (Заказчик просмотрел ПРОФОРМУ)
-            cursor.execute("""
-                SELECT session_number 
-                FROM orders 
-                WHERE user_id = ? 
-                AND status = ? 
-                ORDER BY session_number DESC 
-                LIMIT 1
-            """, (user_id, ORDER_STATUS["5-Заказчик зашел в АдминБот и просмотрел свою ПРОФОРМУ"]))
-
-            result = cursor.fetchone()
-
-            if result:
-                return result[0]  # Возвращает session_number для статуса 5
-            else:
-                raise ValueError("Нет подходящих записей для этого пользователя.")
-
-    finally:
-        conn.close()
 
 
 # Обработчик нажатий на кнопки
@@ -170,9 +125,10 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             'it': "Scegli"
         }
 
+        user_id = update.effective_user.id  # Получаем user_id пользователя
         new_options_message = await query.message.reply_text(
             headers.get(language_code, "Choose"),
-            reply_markup=user_options_keyboard(language_code)
+            reply_markup=user_options_keyboard(language_code,user_id)
         )
 
         # Обновляем ID сообщения с новыми опциями

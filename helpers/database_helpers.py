@@ -90,3 +90,50 @@ async def send_proforma_to_user(user_id, session_number, user_data):
 
     finally:
         conn.close()
+
+def get_latest_session_number(user_id):
+    """
+    Получает максимальный session_number для пользователя с user_id.
+    Если найден статус 4, обновляет его на 5 после просмотра проформы.
+    """
+    conn = sqlite3.connect(DATABASE_PATH)
+    cursor = conn.cursor()
+
+    try:
+        # Сначала пытаемся найти session_number со статусом 4 (Ирина и Сервисная служба получили сообщение)
+        cursor.execute("""
+            SELECT session_number 
+            FROM orders 
+            WHERE user_id = ? 
+            AND status = ? 
+            ORDER BY session_number DESC 
+            LIMIT 1
+        """, (user_id, ORDER_STATUS["4-Ирина и Сервисная служба получили сообщение о новой ПРОФОРМЕ"]))
+
+        result = cursor.fetchone()
+
+        if result:
+            session_number = result[0]
+
+            return session_number  # Возвращает session_number после обновления статуса
+
+        else:
+            # Если ничего не найдено, ищем session_number со статусом 5 (Заказчик просмотрел ПРОФОРМУ)
+            cursor.execute("""
+                SELECT session_number 
+                FROM orders 
+                WHERE user_id = ? 
+                AND status = ? 
+                ORDER BY session_number DESC 
+                LIMIT 1
+            """, (user_id, ORDER_STATUS["5-Заказчик зашел в АдминБот и просмотрел свою ПРОФОРМУ"]))
+
+            result = cursor.fetchone()
+
+            if result:
+                return result[0]  # Возвращает session_number для статуса 5
+            else:
+                raise ValueError("Нет подходящих записей для этого пользователя.")
+
+    finally:
+        conn.close()
