@@ -1,7 +1,7 @@
 ## keyboards.py
 
 from telegram import InlineKeyboardMarkup, InlineKeyboardButton
-from translations import button_texts  # Импортируем тексты кнопок
+from translations import button_texts, translations  # Импортируем тексты кнопок
 
 def language_selection_keyboard():
     """Генерирует клавиатуру для выбора языка."""
@@ -47,11 +47,25 @@ def service_menu_keyboard():
 
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+import urllib.parse
+
+
 def user_options_keyboard(language):
     """Генерирует клавиатуру с тремя кнопками."""
+
+    # Получаем текст сообщения для WhatsApp на нужном языке
+    whatsapp_message = translations[language]['whatsapp_message']
+
+    # Кодируем сообщение для использования в URL
+    encoded_message = urllib.parse.quote(whatsapp_message)
+
+    # Формируем URL для WhatsApp
+    whatsapp_url = f'https://wa.me/34667574895?text={encoded_message}'
+
     keyboard = [
         [InlineKeyboardButton(button_texts[language][0], callback_data='get_proforma')],
-        [InlineKeyboardButton(button_texts[language][1], url='https://www.instagram.com/picnicsalicante')],
-        [InlineKeyboardButton(button_texts[language][2], url='https://wa.me/34667574895?text=Привет,%20Ирина!%20У%20меня%20есть%20вопрос%20по%20поводу%20пикника.')]
+        [InlineKeyboardButton(button_texts[language][1], url=whatsapp_url)],
+        [InlineKeyboardButton(button_texts[language][2], url='https://www.instagram.com/picnicsalicante')]
     ]
     return InlineKeyboardMarkup(keyboard)
