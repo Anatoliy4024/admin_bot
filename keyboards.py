@@ -5,29 +5,10 @@ import urllib.parse
 
 import urllib.parse
 
-# def language_selection_keyboard():
-#     """Генерирует клавиатуру для выбора языка."""
-#     keyboard = [
-#         [
-#             InlineKeyboardButton("🇬🇧 EN", callback_data='lang_en'),
-#             InlineKeyboardButton("🇪🇸 ES", callback_data='lang_es'),
-#             InlineKeyboardButton("🇮🇹 IT", callback_data='lang_it'),
-#             InlineKeyboardButton("🇫🇷 FR", callback_data='lang_fr')
-#         ],
-#         [
-#             InlineKeyboardButton("🇺🇦 UA", callback_data='lang_uk'),
-#             InlineKeyboardButton("🇵🇱 PL", callback_data='lang_pl'),
-#             InlineKeyboardButton("🇩🇪 DE", callback_data='lang_de'),
-#             InlineKeyboardButton("🇷🇺 RU", callback_data='lang_ru')
-#         ]
-#     ]
-#     return InlineKeyboardMarkup(keyboard)
-#
-# from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 def irina_service_menu():
     keyboard = [
-        [InlineKeyboardButton("Найти и смотреть ордер", callback_data='find_and_view_order')],
+        [InlineKeyboardButton("Найти и смотреть ПРОФОРМУ", callback_data='find_and_view_order')],
         # Другие кнопки
         [InlineKeyboardButton("Кнопка 2", callback_data='btn2')],
         [InlineKeyboardButton("Кнопка 3", callback_data='btn3')],
@@ -52,9 +33,12 @@ from helpers.database_helpers import get_latest_session_number, get_full_proform
 import urllib.parse
 import logging
 
+from translations import translations  # Убедитесь, что словарь translations подключен
+
 def user_options_keyboard(language, user_id):
-    # Стандартное сообщение
-    contact_message = "Привет, Ирина! У меня есть вопрос по поводу моего заказа."
+    # Стандартное сообщение на языке пользователя
+    trans = translations.get(language, translations['en'])  # Используем 'en' как язык по умолчанию
+    contact_message = trans['whatsapp_message']
 
     try:
         # Получаем последний session_number для пользователя
@@ -64,11 +48,10 @@ def user_options_keyboard(language, user_id):
             # Получаем полную информацию о проформе
             order_info = get_full_proforma(user_id, session_number)
 
-            if order_info and len(order_info) >= 2:
-                # Формируем номер проформы
-                proforma_number = f"{order_info[0]}_{order_info[1]}"
-                # Обновляем сообщение с номером проформы
-                contact_message = f"Привет, Ирина! Моя ПРОФОРМА {proforma_number}. У меня есть вопрос по поводу моего заказа."
+            if order_info and len(order_info) >= 3:  # Убедитесь, что данные извлечены корректно
+                # Формируем номер проформы и добавляем статус
+                proforma_number = f"{order_info[0]}_{order_info[1]}_{order_info[10]}"
+                contact_message = f"{trans['whatsapp_message']} {proforma_number}. {trans['whatsapp_footer']}"
     except Exception as e:
         logging.error(f"Ошибка при получении номера проформы: {e}")
         # Оставляем contact_message по умолчанию

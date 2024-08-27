@@ -1,17 +1,15 @@
 import sqlite3
 import logging
-from telegram import Update, Bot
-from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, ContextTypes
+from telegram import Update
+from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, CallbackQueryHandler, MessageHandler, filters
 from config.config import DATABASE_PATH, BOT_TOKEN, IRA_CHAT_ID, ADMIN_CHAT_ID  # Импортируем ID ДЛЯ СЦЕНАРИЯ ИРИНА И СЕРВИС
-from modules.constants import UserData, disable_language_buttons, ORDER_STATUS
+from modules.constants import UserData, ORDER_STATUS
 from helpers.database_helpers import send_proforma_to_user, get_full_proforma, get_latest_session_number
 from keyboards import user_options_keyboard, irina_service_menu, service_menu_keyboard
-from telegram.ext import ApplicationBuilder, CommandHandler, CallbackQueryHandler, MessageHandler, filters
 from translations import language_selection_keyboard
 
 
 ORDER_STATUS_REVERSE = {v: k for k, v in ORDER_STATUS.items()}
-
 
 # Логирование
 logging.basicConfig(
@@ -19,7 +17,6 @@ logging.basicConfig(
     level=logging.INFO,
     filename='helpers/logs/admin_bot.log'
 )
-
 logger = logging.getLogger(__name__)
 
 # Обработчик команды /start
@@ -76,10 +73,6 @@ def get_user_info_by_user_id(user_id):
     user_info = cursor.fetchone()
     conn.close()
     return user_info
-
-# Функция для получения последнего session_number
-
-
 
 # Обработчик нажатий на кнопки
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -159,7 +152,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     elif query.data == 'find_and_view_order':
         try:
             # Отправляем сообщение с запросом номера ордера
-            await query.message.reply_text("Пожалуйста, введите номер ордера:")
+            await query.message.reply_text("Пожалуйста, введите номер ПРОФОРМЫ:")
 
             # Устанавливаем шаг для ожидания ввода номера ордера
             user_data.set_step('awaiting_order_number')
@@ -185,20 +178,20 @@ async def irina_service_buttons_callback(update: Update, context: ContextTypes.D
         await query.message.reply_text("Вы выбрали действие 5")
 
 
-def format_proforma_message(order_info):
-    """Форматирует сообщение с информацией о проформе для Ирины."""
-    return (
-        f"Информация по заказу:\n"
-        f"Номер проформы: {order_info[0]}_{order_info[1]}\n"
-        f"Дата мероприятия: {order_info[2]}\n"
-        f"Время: {order_info[3]} - {order_info[4]}\n"
-        f"Количество людей: {order_info[5]}\n"
-        f"Стиль мероприятия: {order_info[6]}\n"
-        f"Город: {order_info[7]}\n"
-        f"Стоимость: {order_info[8]} евро\n"
-        f"Предпочтения: {order_info[9]}\n"  # Добавляем предпочтения
-        f"Текущий статус: {order_info[10]}"  # Добавляем текущий статус
-    )
+# def format_proforma_message(order_info):
+#     """Форматирует сообщение с информацией о проформе для Ирины."""
+#     return (
+#         f"Информация по заказу:\n"
+#         f"Номер проформы: {order_info[0]}_{order_info[1]}_{order_info[10]}\n"
+#         f"Дата мероприятия: {order_info[2]}\n"
+#         f"Время: {order_info[3]} - {order_info[4]}\n"
+#         f"Количество людей: {order_info[5]}\n"
+#         f"Стиль мероприятия: {order_info[6]}\n"
+#         f"Город: {order_info[7]}\n"
+#         f"Стоимость: {order_info[8]} евро\n"
+#         f"Предпочтения: {order_info[9]}\n"  # Добавляем предпочтения
+#         # f"Текущий статус: {order_info[10]}"  # Добавляем текущий статус
+#     )
 
 
 async def handle_irina_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -224,7 +217,7 @@ async def handle_irina_input(update: Update, context: ContextTypes.DEFAULT_TYPE)
             # Формируем сообщение с информацией о проформе
             message_text = (
                 f"Информация по заказу:\n"
-                f"Номер проформы: {order_info[0]}_{order_info[1]}\n"
+                f"Номер проформы: {order_info[0]}_{order_info[1]}_{order_info[10]}\n"
                 f"Дата мероприятия: {order_info[2]}\n"
                 f"Время: {order_info[3]} - {order_info[4]}\n"
                 f"Количество людей: {order_info[5]}\n"
@@ -238,6 +231,21 @@ async def handle_irina_input(update: Update, context: ContextTypes.DEFAULT_TYPE)
             # Отправляем информацию о проформе Ирине и сохраняем ID сообщения
             sent_message = await update.message.reply_text(message_text)
             context.user_data['proforma_message_id'] = sent_message.message_id
+
+            # Меняем статус на 55
+            conn = sqlite3.connect(DATABASE_PATH)
+            try:
+                cursor = conn.cursor()
+                cursor.execute(
+                    "UPDATE orders SET status = ? WHERE user_id = ? AND session_number = ?",
+                    (ORDER_STATUS["55-Ирина зашла в АдминБот и просмотрела новую ПРОФОРМУ"], user_id, session_number)
+                )
+                conn.commit()
+            except Exception as e:
+                logging.error(f"Ошибка при обновлении статуса: {e}")
+            finally:
+                conn.close()
+
         else:
             await update.message.reply_text("Проформа не найдена.")
 

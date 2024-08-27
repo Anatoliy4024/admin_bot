@@ -27,7 +27,8 @@ translations = {
         'status': "Status:",
         'delivery_info': "If the event zone is within Alicante (15 km zone), the delivery of equipment is free. If further, the cost is 0.5 euros per km.",
         'currency': "euros",
-        'whatsapp_message': "Hi, Irina! I have a question about my order."
+        'whatsapp_message': "Hi, Irina! I have a question about my order",
+        'whatsapp_footer': "(please write your question here)"
     },
     'ru': {
         'order_confirmed': "Ваш заказ подтвержден!",
@@ -41,7 +42,8 @@ translations = {
         'status': "Статус:",
         'delivery_info': "Если зона мероприятия в пределах Аликанте (15 км зона), доставка реквизита бесплатна. Если дальше, стоимость 0.5 евро за км.",
         'currency': "евро",
-        'whatsapp_message': "Привет, Ирина! У меня есть вопрос по поводу моего заказа."
+        'whatsapp_message': "Привет, Ирина! У меня есть вопрос по поводу моего заказа",
+        'whatsapp_footer': "(напишите ваш вопрос здесь)"
     },
     'de': {
         'order_confirmed': "Ihre Bestellung ist bestätigt!",
@@ -55,7 +57,8 @@ translations = {
         'status': "Status:",
         'delivery_info': "Wenn die Veranstaltungszone innerhalb von Alicante (15 km Zone) liegt, ist die Lieferung der Ausrüstung kostenlos. Wenn weiter, betragen die Kosten 0,5 Euro pro km.",
         'currency': "Euro",
-        'whatsapp_message': "Hallo, Irina! Ich habe eine Frage zu meiner Bestellung."
+        'whatsapp_message': "Hallo, Irina! Ich habe eine Frage zu meiner Bestellung",
+        'whatsapp_footer': "(bitte schreiben Sie hier Ihre Frage)"
     },
     'es': {
         'order_confirmed': "¡Su pedido está confirmado!",
@@ -69,7 +72,8 @@ translations = {
         'status': "Estado:",
         'delivery_info': "Si la zona del evento está dentro de Alicante (zona de 15 km), la entrega del equipo es gratuita. Si está más lejos, el costo es de 0,5 euros por km.",
         'currency': "euros",
-        'whatsapp_message': "Hola, Irina! Tengo una pregunta sobre mi pedido."
+        'whatsapp_message': "Hola, Irina! Tengo una pregunta sobre mi pedido",
+        'whatsapp_footer': "(por favor escribe tu pregunta aquí)"
     },
     'fr': {
         'order_confirmed': "Votre commande est confirmée!",
@@ -83,7 +87,8 @@ translations = {
         'status': "Statut:",
         'delivery_info': "Si la zone de l'événement se trouve dans les environs d'Alicante (zone de 15 km), la livraison de l'équipement est gratuite. Sinon, le coût est de 0,5 euros par km.",
         'currency': "euros",
-        'whatsapp_message': "Bonjour, Irina! J'ai une question concernant ma commande."
+        'whatsapp_message': "Bonjour, Irina! J'ai une question concernant ma commande",
+        'whatsapp_footer': "(veuillez écrire votre question ici)"
     },
     'uk': {
         'order_confirmed': "Ваше замовлення підтверджено!",
@@ -97,7 +102,8 @@ translations = {
         'status': "Статус:",
         'delivery_info': "Якщо зона заходу знаходиться в межах Аліканте (зона 15 км), доставка обладнання безкоштовна. Якщо далі, вартість становить 0,5 євро за км.",
         'currency': "євро",
-        'whatsapp_message': "Привіт, Ірино! У мене є питання щодо мого замовлення."
+        'whatsapp_message': "Привіт, Ірино! У мене є питання щодо мого замовлення",
+        'whatsapp_footer': "(будь ласка, напишіть своє питання тут)"
     },
     'pl': {
         'order_confirmed': "Twoje zamówienie zostało potwierdzone!",
@@ -111,7 +117,8 @@ translations = {
         'status': "Status:",
         'delivery_info': "Jeśli strefa wydarzenia znajduje się w Alicante (strefa 15 km), dostawa sprzętu jest bezpłatna. Jeśli dalej, koszt wynosi 0,5 euro za km.",
         'currency': "euro",
-        'whatsapp_message': "Cześć, Irina! Mam pytanie dotyczące mojego zamówienia."
+        'whatsapp_message': "Cześć, Irina! Mam pytanie dotyczące mojego zamówienia",
+        'whatsapp_footer': "(proszę napisz tutaj swoje pytanie)"
     },
     'it': {
         'order_confirmed': "Il tuo ordine è confermato!",
@@ -125,7 +132,8 @@ translations = {
         'status': "Stato:",
         'delivery_info': "Se la zona dell'evento è entro 15 km da Alicante, la consegna dell'attrezzatura è gratuita. Se più lontano, il costo è di 0,5 euro per km.",
         'currency': "euro",
-        'whatsapp_message': "Ciao, Irina! Ho una domanda sul mio ordine."
+        'whatsapp_message': "Ciao, Irina! Ho una domanda sul mio ordine",
+        'whatsapp_footer': "(per favore scrivi qui la tua domanda)"
     }
 }
 

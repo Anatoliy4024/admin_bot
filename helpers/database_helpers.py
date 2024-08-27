@@ -45,7 +45,7 @@ def get_full_proforma(user_id, session_number):
 
 async def send_proforma_to_user(user_id, session_number, user_data):
     """Отправляет информацию о заказе пользователю."""
-
+    conn = None  # Инициализация переменной
     try:
         # Получаем полную проформу
         order_info = get_full_proforma(user_id, session_number)
@@ -57,7 +57,7 @@ async def send_proforma_to_user(user_id, session_number, user_data):
         # Формируем сообщение для отправки пользователю
         user_message = (
             f"{trans['order_confirmed']}\n"
-            f"{trans['proforma_number']} {order_info[0]}_{order_info[1]}_3\n"
+            f"{trans['proforma_number']} {order_info[0]}_{order_info[1]}_{order_info[10]}\n"
             f"{trans['event_date']} {order_info[2]}\n"
             f"{trans['time']} {order_info[3]} - {order_info[4]}\n"
             f"{trans['people_count']} {order_info[5]}\n"
@@ -88,9 +88,11 @@ async def send_proforma_to_user(user_id, session_number, user_data):
         logging.error(f"Failed to send order info to user: {e}")
         print(f"Ошибка при отправке сообщения: {e}")
 
-    finally:
+    if conn:  # Проверяем, инициализирована ли переменная
+
         conn.close()
 
+# Функция для получения последнего session_number
 def get_latest_session_number(user_id):
     """
     Получает максимальный session_number для пользователя с user_id.
