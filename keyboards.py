@@ -1,19 +1,36 @@
-## keyboards.py
+# keybords.py
 
-from translations import button_texts
+from helpers.database_helpers import get_latest_session_number, get_full_proforma
+import logging
 import urllib.parse
-
+from translations import translations, button_texts
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import CallbackContext
 import urllib.parse
+import logging
 
+
+
+
+async def delete_client(update: Update, context: CallbackContext):
+    logging.info("Функция delete_client вызвана")
+    query = update.callback_query
+    await query.answer()
+
+    # Логирование для отладки
+    logging.info("Функция delete_client вызвана")
+
+    # Запрашиваем у Ирины дату для удаления клиента
+    await query.message.reply_text("Введите дату клиента, которого хотите удалить (формат ДД.ММ.ГГГГ):")
+
+    # Устанавливаем шаг, чтобы бот ожидал ввода даты
+    context.user_data['step'] = 'awaiting_date_for_deletion'
 
 def irina_service_menu():
     keyboard = [
         [InlineKeyboardButton("Найти и смотреть ПРОФОРМУ", callback_data='find_and_view_order')],
-        # Другие кнопки
-        [InlineKeyboardButton("Кнопка 2", callback_data='btn2')],
-        [InlineKeyboardButton("Кнопка 3", callback_data='btn3')],
-        [InlineKeyboardButton("Кнопка 4", callback_data='btn4')],
-        [InlineKeyboardButton("Кнопка 5", callback_data='btn5')],
+        [InlineKeyboardButton("Внести клиента в базу данных", callback_data='add_client')],
+        [InlineKeyboardButton("Удалить клиента из базы данных", callback_data='delete_client')]
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -26,14 +43,6 @@ def service_menu_keyboard():
         [InlineKeyboardButton("Кнопка 14", callback_data='btn14')],
     ]
     return InlineKeyboardMarkup(keyboard)
-
-
-from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-from helpers.database_helpers import get_latest_session_number, get_full_proforma
-import urllib.parse
-import logging
-
-from translations import translations  # Убедитесь, что словарь translations подключен
 
 def user_options_keyboard(language, user_id):
     # Стандартное сообщение на языке пользователя

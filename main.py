@@ -5,7 +5,7 @@ from telegram.ext import ContextTypes, ApplicationBuilder, CommandHandler, Callb
 from config.config import DATABASE_PATH, BOT_TOKEN, IRA_CHAT_ID, ADMIN_CHAT_ID  # Импортируем ID ДЛЯ СЦЕНАРИЯ ИРИНА И СЕРВИС
 from modules.constants import UserData, ORDER_STATUS
 from helpers.database_helpers import send_proforma_to_user, get_full_proforma, get_latest_session_number
-from keyboards import user_options_keyboard, irina_service_menu, service_menu_keyboard
+from keyboards import user_options_keyboard, irina_service_menu, service_menu_keyboard, delete_client
 from translations import language_selection_keyboard
 
 
@@ -161,37 +161,6 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.message.reply_text("Произошла ошибка при попытке обработать запрос на поиск ордера.")
 
 
-# Добавляем обработчик для кнопок Ирины и Службы сервиса
-async def irina_service_buttons_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    await query.answer()
-
-    if query.data == 'btn1':
-        await query.message.reply_text("Вы выбрали действие 1")
-    elif query.data == 'btn2':
-        await query.message.reply_text("Вы выбрали действие 2")
-    elif query.data == 'btn3':
-        await query.message.reply_text("Вы выбрали действие 3")
-    elif query.data == 'btn4':
-        await query.message.reply_text("Вы выбрали действие 4")
-    elif query.data == 'btn5':
-        await query.message.reply_text("Вы выбрали действие 5")
-
-
-# def format_proforma_message(order_info):
-#     """Форматирует сообщение с информацией о проформе для Ирины."""
-#     return (
-#         f"Информация по заказу:\n"
-#         f"Номер проформы: {order_info[0]}_{order_info[1]}_{order_info[10]}\n"
-#         f"Дата мероприятия: {order_info[2]}\n"
-#         f"Время: {order_info[3]} - {order_info[4]}\n"
-#         f"Количество людей: {order_info[5]}\n"
-#         f"Стиль мероприятия: {order_info[6]}\n"
-#         f"Город: {order_info[7]}\n"
-#         f"Стоимость: {order_info[8]} евро\n"
-#         f"Предпочтения: {order_info[9]}\n"  # Добавляем предпочтения
-#         # f"Текущий статус: {order_info[10]}"  # Добавляем текущий статус
-#     )
 
 
 async def handle_irina_input(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -271,9 +240,12 @@ def parse_proforma_number(proforma_number):
 if __name__ == '__main__':
     application = ApplicationBuilder().token(BOT_TOKEN).build()
 
-    application.add_handler(CommandHandler('start', start))
+    # Регистрация более специфического обработчика для delete_client
+    application.add_handler(CallbackQueryHandler(delete_client, pattern='delete_client'))
+
+    # Затем регистрируем остальные обработчики
     application.add_handler(CallbackQueryHandler(button_callback))
-    application.add_handler(CallbackQueryHandler(irina_service_buttons_callback))
-    application.add_handler(MessageHandler(filters.TEXT & filters.User(IRA_CHAT_ID), handle_irina_input))  # Обработчик для Ирины
+    application.add_handler(
+        MessageHandler(filters.TEXT & filters.User(IRA_CHAT_ID), handle_irina_input))  # Обработчик для Ирины
 
     application.run_polling()
